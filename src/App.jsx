@@ -1,13 +1,25 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { HiMail } from "react-icons/hi";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Menu, X, Download } from "lucide-react";
 import { projects } from "./data/projects";
 import TypeWriter from "./components/TypeWriter";
 import { useTheme } from "./context/ThemeContext";
+import ContactForm from "./components/ContactForm";
+import SkillsSection from "./components/SkillsSection";
 
 function App() {
   const { darkMode, toggleDarkMode } = useTheme();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
 
   return (
     <div className={darkMode ? "dark" : ""}>
@@ -22,7 +34,8 @@ function App() {
               <span className="text-[#FF6B35]">/&gt;</span>
             </h1>
 
-            <div className="flex items-center gap-8">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
               <a
                 href="#projects"
                 className="text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] dark:hover:text-[#FF6B35] transition-colors"
@@ -55,7 +68,71 @@ function App() {
                 )}
               </button>
             </div>
+
+            {/* Mobile Menu Button & Dark Mode Toggle */}
+            <div className="flex md:hidden items-center gap-4">
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? (
+                  <Sun className="w-5 h-5 text-yellow-400" />
+                ) : (
+                  <Moon className="w-5 h-5 text-gray-700" />
+                )}
+              </button>
+
+              <button
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                ) : (
+                  <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
+              >
+                <div className="px-6 py-4 space-y-4">
+                  <a
+                    href="#projects"
+                    onClick={closeMobileMenu}
+                    className="block text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] dark:hover:text-[#FF6B35] transition-colors py-2"
+                  >
+                    Projects
+                  </a>
+                  <a
+                    href="#about"
+                    onClick={closeMobileMenu}
+                    className="block text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] dark:hover:text-[#FF6B35] transition-colors py-2"
+                  >
+                    About
+                  </a>
+                  <a
+                    href="#contact"
+                    onClick={closeMobileMenu}
+                    className="block text-gray-600 dark:text-gray-300 hover:text-[#FF6B35] dark:hover:text-[#FF6B35] transition-colors py-2"
+                  >
+                    Contact
+                  </a>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </nav>
 
         {/* Hero Section */}
@@ -98,6 +175,15 @@ function App() {
               >
                 Get in Touch
               </a>
+              <a
+                href="https://docs.google.com/document/d/1UixceeULsa2DKOrOnXiDCZ8XGdAsHvcwnE4_iGGS-o4/edit?tab=t.0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3 border-2 border-[#FF6B35] text-[#FF6B35] dark:text-[#FF6B35] font-semibold rounded-lg hover:bg-[#FF6B35] hover:text-white transition-all transform hover:scale-105 active:scale-95"
+              >
+                <Download className="w-5 h-5" />
+                Resume
+              </a>
             </div>
           </motion.div>
         </section>
@@ -122,12 +208,20 @@ function App() {
                   className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all transform hover:scale-105"
                 >
                   {/* Project Image */}
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                    {project.image ? (
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-white text-2xl font-bold">
+                          {project.title}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Project Info */}
@@ -208,28 +302,7 @@ function App() {
 
                 {/* Skills */}
                 <div className="mt-8">
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                    Tech Stack
-                  </h4>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      "React",
-                      "JavaScript",
-                      "Tailwind CSS",
-                      "HTML/CSS",
-                      "Git/GitHub",
-                      "Vite",
-                      "REST APIs",
-                      "Responsive Design",
-                    ].map((skill) => (
-                      <span
-                        key={skill}
-                        className="px-4 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-lg font-medium"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+                  <SkillsSection />
                 </div>
               </div>
             </motion.div>
@@ -237,57 +310,66 @@ function App() {
         </section>
 
         {/* Contact Section */}
+        {/* Contact Section */}
         <section
           id="contact"
           className="py-20 px-4 bg-gray-50 dark:bg-gray-800 transition-colors"
         >
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+              <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">
                 Let's Connect
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-lg mb-12">
+              <p className="text-gray-600 dark:text-gray-400 text-lg mb-12 text-center">
                 I'm actively looking for frontend developer opportunities. Feel
                 free to reach out!
               </p>
 
+              {/* Contact Form */}
+              <ContactForm />
+
               {/* Social Links */}
-              <div className="flex justify-center gap-6 flex-wrap">
-                <a
-                  href="https://github.com/NiyiCodes0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-all transform hover:scale-110 active:scale-95 shadow-lg"
-                >
-                  <FaGithub size={28} />
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/adeniyidev/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all transform hover:scale-110 active:scale-95 shadow-lg"
-                >
-                  <FaLinkedin size={28} />
-                </a>
-                <a
-                  href="https://twitter.com/Adeniyi_Morak"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-all transform hover:scale-110 active:scale-95 shadow-lg"
-                >
-                  <FaTwitter size={28} />
-                </a>
-                <a
-                  href="mailto:your.email@example.com"
-                  className="p-4 bg-[#FF6B35] text-white rounded-lg hover:bg-[#FF8A5B] transition-all transform hover:scale-110 active:scale-95 shadow-lg"
-                >
-                  <HiMail size={28} />
-                </a>
+              <div className="mt-12 text-center">
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Or connect with me on:
+                </p>
+                <div className="flex justify-center gap-6 flex-wrap">
+                  <a
+                    href="https://github.com/NiyiCodes0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-4 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-all transform hover:scale-110 active:scale-95 shadow-lg"
+                  >
+                    <FaGithub size={28} />
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/adeniyidev/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all transform hover:scale-110 active:scale-95 shadow-lg"
+                  >
+                    <FaLinkedin size={28} />
+                  </a>
+                  <a
+                    href="https://twitter.com/Adeniyi_Morak"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-4 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-all transform hover:scale-110 active:scale-95 shadow-lg"
+                  >
+                    <FaTwitter size={28} />
+                  </a>
+                  <a
+                    href="mailto:your.email@example.com"
+                    className="p-4 bg-[#FF6B35] text-white rounded-lg hover:bg-[#FF8A5B] transition-all transform hover:scale-110 active:scale-95 shadow-lg"
+                  >
+                    <HiMail size={28} />
+                  </a>
+                </div>
               </div>
             </motion.div>
           </div>
